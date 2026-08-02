@@ -18,6 +18,9 @@
     }
   },
   "remoteUser": "node",
+  "remoteEnv": {
+    "PATH": "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}

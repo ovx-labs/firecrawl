@@ -1,5 +1,5 @@
 {
-  "name": "Firecrawl Dev (2024-08-02)",
+  "name": "Firecrawl Dev (optimized)",
   "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra@sha256:20128f56996134fcdb59400ba97e2c3cfcd80a94edc426889e3f993f8d8dd292",
   "workspaceFolder": "/workspaces/firecrawl/apps/api",
   "forwardPorts": [3000, 3002, 3004, 3005, 6379, 5432, 5672],
@@ -16,7 +16,6 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   }
 }

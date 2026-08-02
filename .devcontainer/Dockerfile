@@ -5,11 +5,14 @@ USER root
 # Install pnpm globally
 RUN npm install -g pnpm@10.32.1
 
-# Install Rust system-wide
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal \
-    && . /root/.cargo/env \
+# Install Rust for all users via rustup
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path \
     && rustup target add x86_64-unknown-linux-gnu \
-    && cp -r /root/.cargo/bin/* /usr/local/bin/
+    && chmod -R a+rw $RUSTUP_HOME $CARGO_HOME
 
 # Install sshd
 RUN apt-get update && apt-get install -y openssh-server \

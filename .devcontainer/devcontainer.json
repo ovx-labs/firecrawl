@@ -1,6 +1,6 @@
 {
   "name": "Firecrawl Codespace",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra@sha256:3d25e3b70c6021af0c1404f6006f1ab3bc3f8e34cac970b9ca81358af24bb105",
   "workspaceFolder": "/workspaces/firecrawl/apps/api",
   "forwardPorts": [3000, 3002, 3004, 3005, 6379, 5432, 5672],
   "customizations": {
@@ -18,14 +18,6 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/rust:1": {
-      "version": "latest",
-      "profile": "minimal"
-    },
-    "ghcr.io/devcontainers/features/sshd:1": {
-      "version": "latest"
-    }
-  },
-  "postCreateCommand": "npm install -g pnpm@10.32.1"
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
 }

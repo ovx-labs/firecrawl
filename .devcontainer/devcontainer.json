@@ -16,9 +16,9 @@
       }
     }
   },
-  "remoteUser": "node",
+  "remoteUser": "vscode",
   "remoteEnv": {
-    "PATH": "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+    "PATH": "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/home/vscode/.cargo/bin:/home/vscode/.local/share/pnpm"
   },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},

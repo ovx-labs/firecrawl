@@ -3,7 +3,6 @@
   "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra:latest",
   "workspaceFolder": "/workspaces/firecrawl/apps/api",
   "forwardPorts": [3000, 3002, 3004, 3005, 6379, 5432, 5672],
-  "postCreateCommand": "bash /workspaces/firecrawl/.devcontainer/setup.sh",
   "customizations": {
     "vscode": {
       "extensions": [

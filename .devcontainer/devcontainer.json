@@ -1,6 +1,6 @@
 {
   "name": "Firecrawl Codespace",
-  "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra@sha256:c2a92ec9fd27bcbd279f23dc09384372114052e5ebf7ae35f8d6847c65f5e5fe",
+  "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra@sha256:2b99124cf20a082fbcfb75bd8523339b5a66f928d7c9401b195e4b26c93db543",
   "workspaceFolder": "/workspaces/firecrawl/apps/api",
   "forwardPorts": [3000, 3002, 3004, 3005, 6379, 5432, 5672],
   "customizations": {

@@ -1,6 +1,6 @@
 {
   "name": "Firecrawl Codespace",
-  "image": "ghcr.io/ovx-labs/firecrawl-codespace-infra@sha256:2b99124cf20a082fbcfb75bd8523339b5a66f928d7c9401b195e4b26c93db543",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "workspaceFolder": "/workspaces/firecrawl/apps/api",
   "forwardPorts": [3000, 3002, 3004, 3005, 6379, 5432, 5672],
   "customizations": {
@@ -16,11 +16,13 @@
       }
     }
   },
-  "remoteEnv": {
-    "PATH": "/home/vscode/.cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
-  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  }
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest",
+      "profile": "minimal"
+    }
+  },
+  "postCreateCommand": "npm install -g pnpm@10.32.1"
 }

@@ -18,7 +18,7 @@ jobs:
       - name: Check for existing codespace
         id: check
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           echo "Checking for existing codespaces..."
           EXISTING=$(gh codespace list --repo ${{ github.repository }} --json name,state --jq '.[] | select(.state=="Available") | .name' | head -1)
@@ -36,7 +36,7 @@ jobs:
         if: steps.check.outputs.found == 'false'
         id: create
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           echo "Creating new codespace..."
           START_TIME=$(date +%s)
@@ -71,7 +71,7 @@ jobs:
       - name: Get codespace connection info
         id: info
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
           CODESPACE_NAME: ${{ steps.check.outputs.found == 'true' && steps.check.outputs.codespace_name || steps.create.outputs.codespace_name }}
         run: |
           echo "Getting connection information..."
@@ -95,7 +95,7 @@ jobs:
       
       - name: Verify codespace health
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
           CODESPACE_NAME: ${{ steps.info.outputs.codespace_name }}
         run: |
           echo "Verifying codespace health..."

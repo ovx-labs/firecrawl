@@ -1,0 +1,122 @@
+name: Start Firecrawl Codespace
+
+on:
+  workflow_dispatch:
+    inputs:
+      retention_period_minutes:
+        description: 'Codespace retention period in minutes'
+        required: false
+        default: '60'
+        type: string
+
+jobs:
+  start-codespace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Check for existing codespace
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking for existing codespaces..."
+          EXISTING=$(gh codespace list --repo ${{ github.repository }} --json name,state --jq '.[] | select(.state=="Available") | .name' | head -1)
+          
+          if [ -n "$EXISTING" ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "codespace_name=$EXISTING" >> $GITHUB_OUTPUT
+            echo "Found existing available codespace: $EXISTING"
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No available codespace found"
+          fi
+      
+      - name: Create new codespace
+        if: steps.check.outputs.found == 'false'
+        id: create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Creating new codespace..."
+          START_TIME=$(date +%s)
+          
+          CODESPACE_NAME=$(gh codespace create \
+            --repo ${{ github.repository }} \
+            --branch ${{ github.ref_name }} \
+            --machine basicLinux32gb \
+            --retention-period ${{ inputs.retention_period_minutes }}m \
+            --display-name "firecrawl-auto-$(date +%Y%m%d-%H%M%S)" \
+            --idle-timeout 30m)
+          
+          echo "codespace_name=$CODESPACE_NAME" >> $GITHUB_OUTPUT
+          echo "Created codespace: $CODESPACE_NAME"
+          
+          # Wait for codespace to be ready
+          echo "Waiting for codespace to initialize..."
+          while true; do
+            STATE=$(gh codespace view --codespace "$CODESPACE_NAME" --json state --jq '.state')
+            if [ "$STATE" = "Available" ]; then
+              break
+            fi
+            echo "Current state: $STATE (waiting...)"
+            sleep 2
+          done
+          
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
+          echo "initialization_time=${DURATION}s" >> $GITHUB_OUTPUT
+          echo "Codespace ready in ${DURATION}s"
+      
+      - name: Get codespace connection info
+        id: info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODESPACE_NAME: ${{ steps.check.outputs.found == 'true' && steps.check.outputs.codespace_name || steps.create.outputs.codespace_name }}
+        run: |
+          echo "Getting connection information..."
+          
+          # Get SSH connection string
+          SSH_CONFIG=$(gh codespace ssh --codespace "$CODESPACE_NAME" -- -G 2>&1 | grep "^hostname\|^user\|^port" || true)
+          
+          echo "Codespace Name: $CODESPACE_NAME"
+          echo "SSH Configuration:"
+          echo "$SSH_CONFIG"
+          
+          # Extract connection details
+          HOSTNAME=$(echo "$SSH_CONFIG" | grep "^hostname" | awk '{print $2}')
+          USER=$(echo "$SSH_CONFIG" | grep "^user" | awk '{print $2}')
+          PORT=$(echo "$SSH_CONFIG" | grep "^port" | awk '{print $2}')
+          
+          echo "hostname=$HOSTNAME" >> $GITHUB_OUTPUT
+          echo "user=$USER" >> $GITHUB_OUTPUT
+          echo "port=$PORT" >> $GITHUB_OUTPUT
+          echo "codespace_name=$CODESPACE_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Verify codespace health
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODESPACE_NAME: ${{ steps.info.outputs.codespace_name }}
+        run: |
+          echo "Verifying codespace health..."
+          
+          # Test basic connectivity
+          gh codespace ssh --codespace "$CODESPACE_NAME" -- "echo 'Connection test: OK'"
+          
+          # Check system info
+          echo "System information:"
+          gh codespace ssh --codespace "$CODESPACE_NAME" -- "uname -a"
+          
+          # Check available disk space
+          echo "Disk space:"
+          gh codespace ssh --codespace "$CODESPACE_NAME" -- "df -h / | tail -1"
+          
+          echo "Codespace health check: PASSED"
+    
+    outputs:
+      codespace_name: ${{ steps.info.outputs.codespace_name }}
+      hostname: ${{ steps.info.outputs.hostname }}
+      user: ${{ steps.info.outputs.user }}
+      port: ${{ steps.info.outputs.port }}
+      initialization_time: ${{ steps.create.outputs.initialization_time }}
+      reused_existing: ${{ steps.check.outputs.found }}

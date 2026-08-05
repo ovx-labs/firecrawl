@@ -77,16 +77,16 @@ jobs:
           echo "Getting connection information..."
           
           # Get SSH connection string
-          SSH_CONFIG=$(gh codespace ssh --codespace "$CODESPACE_NAME" -- -G 2>&1 | grep "^hostname\|^user\|^port" || true)
+          SSH_CONFIG=$(gh codespace ssh --codespace "$CODESPACE_NAME" -- -G 2>&1 | grep -E "^(hostname|user|port) " || true)
           
           echo "Codespace Name: $CODESPACE_NAME"
           echo "SSH Configuration:"
           echo "$SSH_CONFIG"
           
           # Extract connection details
-          HOSTNAME=$(echo "$SSH_CONFIG" | grep "^hostname" | awk '{print $2}')
-          USER=$(echo "$SSH_CONFIG" | grep "^user" | awk '{print $2}')
-          PORT=$(echo "$SSH_CONFIG" | grep "^port" | awk '{print $2}')
+          HOSTNAME=$(echo "$SSH_CONFIG" | grep "^hostname " | awk '{print $2}')
+          USER=$(echo "$SSH_CONFIG" | grep "^user " | awk '{print $2}')
+          PORT=$(echo "$SSH_CONFIG" | grep "^port " | awk '{print $2}')
           
           echo "hostname=$HOSTNAME" >> $GITHUB_OUTPUT
           echo "user=$USER" >> $GITHUB_OUTPUT

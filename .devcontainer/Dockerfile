@@ -21,7 +21,7 @@ RUN mkdir -p /etc/ssh/sshd_config.d \
     && echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config \
     && echo "UsePAM yes" >> /etc/ssh/sshd_config
 
-# Copy updated devcontainer.json into the image for prebuilds
-COPY .devcontainer/devcontainer.json /usr/local/share/devcontainer/devcontainer.json
+# DO NOT copy devcontainer.json - let repo's devcontainer.json be used at Codespace creation
+# This prevents base image label from overriding repo's configuration
 
 CMD ["sleep", "infinity"]

@@ -3,6 +3,9 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "dockerComposeFile": ["docker-compose.codespaces.yml"],
+  "service": "api",
+  "runServices": ["api", "redis", "rabbitmq", "nuq-postgres", "playwright-service"],
   "workspaceFolder": "/workspaces/firecrawl",
   "forwardPorts": [3002],
   "portsAttributes": {
@@ -12,7 +15,6 @@
     }
   },
   "postCreateCommand": "echo 'Firecrawl Codespace created. Services will start via docker compose.'",
-  "postStartCommand": "cd /workspaces/firecrawl && docker compose -f .devcontainer/docker-compose.codespaces.yml up -d && echo 'Waiting for Firecrawl API...' && timeout 300 bash -c 'until curl -sf http://localhost:3002/v0/health/liveness; do sleep 2; done' && echo 'Firecrawl API ready'",
   "remoteUser": "node",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},

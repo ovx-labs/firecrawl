@@ -1,7 +1,8 @@
 {
   "name": "Firecrawl Codespace",
-  "dockerComposeFile": ["docker-compose.codespaces.yml"],
-  "service": "api",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "workspaceFolder": "/workspaces/firecrawl",
   "forwardPorts": [3002],
   "portsAttributes": {

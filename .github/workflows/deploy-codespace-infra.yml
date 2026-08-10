@@ -1,0 +1,45 @@
+name: Deploy Codespace Infra Image to GHCR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .devcontainer/Dockerfile
+      - .devcontainer/devcontainer.json
+      - .devcontainer/docker-compose.codespaces.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push codespace infra image
+        uses: docker/build-push-action@v5
+        with:
+          context: .devcontainer
+          file: .devcontainer/Dockerfile
+          push: true
+          tags: ghcr.io/ovx-labs/firecrawl-codespace-infra:latest
+          provenance: false
+          build-args: |
+            GIT_SHA=${{ github.sha }}

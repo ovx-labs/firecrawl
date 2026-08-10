@@ -24,4 +24,7 @@ RUN mkdir -p /etc/ssh/sshd_config.d \
 # Remove any .devcontainer directory from base image to prevent merge conflicts
 RUN rm -rf /usr/local/share/devcontainer 2>/dev/null || true
 
+# Set devcontainer metadata label to match repo's devcontainer.json
+LABEL devcontainer.metadata='[{"name": "Firecrawl Codespace", "build": {"dockerfile": "Dockerfile"}, "dockerComposeFile": ["docker-compose.codespaces.yml"], "service": "api", "runServices": ["api", "redis", "rabbitmq", "nuq-postgres", "playwright-service"], "workspaceFolder": "/workspaces/firecrawl", "forwardPorts": [3002], "portsAttributes": {"3002": {"label": "Firecrawl API", "onAutoForward": "notify"}}, "postCreateCommand": "echo \"Firecrawl Codespace created. Services will start via docker compose.\"", "remoteUser": "node", "features": {"ghcr.io/devcontainers/features/docker-in-docker:2": {}, "ghcr.io/devcontainers/features/github-cli:1": {}}, "customizations": {"vscode": {"extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "ms-playwright.playwright", "rust-lang.rust-analyzer"], "settings": {"terminal.integrated.defaultProfile.linux": "bash"}}}}]'
+
 CMD ["sleep", "infinity"]

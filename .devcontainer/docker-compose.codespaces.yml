@@ -1,0 +1,153 @@
+name: firecrawl-codespace
+
+x-common-service: &common-service
+  image: ghcr.io/firecrawl/firecrawl@sha256:8c7b3c8a7e7c4b8f5a6d3c4f1e9b2a0d7f8c9e1b2a3d4f5e6b7c8d9e0f1a2b3c
+  ulimits:
+    nofile:
+      soft: 65535
+      hard: 65535
+  networks:
+    - backend
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
+      compress: "true"
+
+x-common-env: &common-env
+  REDIS_URL: redis://redis:6379
+  REDIS_RATE_LIMIT_URL: redis://redis:6379
+  PLAYWRIGHT_MICROSERVICE_URL: http://playwright-service:3000/scrape
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: postgres
+  POSTGRES_HOST: nuq-postgres
+  POSTGRES_PORT: 5432
+  USE_DB_AUTHENTICATION: false
+  NUM_WORKERS_PER_QUEUE: 4
+  CRAWL_CONCURRENT_REQUESTS: 5
+  MAX_CONCURRENT_JOBS: 2
+  BROWSER_POOL_SIZE: 2
+  NUQ_BACKEND: pg
+  FDB_CLUSTER_FILE: ""
+
+services:
+  playwright-service:
+    image: ghcr.io/firecrawl/playwright-service@sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3
+    environment:
+      PORT: 3000
+      MAX_CONCURRENT_PAGES: 5
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cpus: 1.5
+    mem_limit: 2G
+    memswap_limit: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+    tmpfs:
+      - /tmp/.cache:noexec,nosuid,size=512m
+
+  api:
+    <<: *common-service
+    environment:
+      <<: *common-env
+      HOST: "0.0.0.0"
+      PORT: 3002
+      EXTRACT_WORKER_PORT: 3004
+      WORKER_PORT: 3005
+      NUQ_RABBITMQ_URL: amqp://rabbitmq:5672
+      HARNESS_STARTUP_TIMEOUT_MS: 120000
+      ENV: local
+    depends_on:
+      redis:
+        condition: service_started
+      playwright-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      nuq-postgres:
+        condition: service_started
+    ports:
+      - "3002:3002"
+    command: node dist/src/harness.js --start-docker
+    cpus: 2.0
+    mem_limit: 4G
+    memswap_limit: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/v0/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - backend
+    command: redis-server --bind 0.0.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    networks:
+      - backend
+    command: rabbitmq-server
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+
+  nuq-postgres:
+    image: ghcr.io/firecrawl/nuq-postgres@sha256:4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+networks:
+  backend:
+    driver: bridge

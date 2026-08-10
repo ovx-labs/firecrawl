@@ -21,7 +21,7 @@ RUN mkdir -p /etc/ssh/sshd_config.d \
     && echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config \
     && echo "UsePAM yes" >> /etc/ssh/sshd_config
 
-# DO NOT copy devcontainer.json - let repo's devcontainer.json be used at Codespace creation
-# This prevents base image label from overriding repo's configuration
+# Remove any .devcontainer directory from base image to prevent merge conflicts
+RUN rm -rf /usr/local/share/devcontainer 2>/dev/null || true
 
 CMD ["sleep", "infinity"]

@@ -1,6 +1,6 @@
 {
   "name": "Firecrawl Codespace",
-  "image": "ghcr.io/firecrawl/firecrawl:latest",
+  "image": "ghcr.io/ovx-labs/firecrawl/codespace-infra:latest",
   "dockerComposeFile": ["docker-compose.codespaces.yml"],
   "service": "api",
   "runServices": ["api", "redis", "rabbitmq", "nuq-postgres", "playwright-service"],

@@ -33,13 +33,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
 
-      - name: Build and push codespace infra image
+      - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
           context: .devcontainer/base
           file: .devcontainer/base/Dockerfile
           push: true
-          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:v5
+          tags: ghcr.io/ovx-labs/firecrawl/codespace-base:latest
+          provenance: false
+          no-cache: true
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+
+      - name: Build and push codespace infra image
+        uses: docker/build-push-action@v5
+        with:
+          context: .devcontainer
+          file: .devcontainer/Dockerfile
+          push: true
+          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:latest
           provenance: false
           no-cache: true
           build-args: |

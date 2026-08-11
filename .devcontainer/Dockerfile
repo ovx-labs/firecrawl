@@ -1,4 +1,4 @@
-FROM ghcr.io/firecrawl/firecrawl:latest
+FROM ghcr.io/ovx-labs/firecrawl/codespace-base:latest
 
 USER root
 

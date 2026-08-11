@@ -1,4 +1,4 @@
-FROM ghcr.io/ovx-labs/firecrawl/codespace-infra:v3
+FROM ghcr.io/ovx-labs/firecrawl/codespace-infra:v2
 
 # Label with devcontainer metadata for GitHub Codespaces - matches repo devcontainer.json exactly
 LABEL devcontainer.metadata='{"name":"Firecrawl Codespace","build":{"dockerfile":"Dockerfile"},"dockerComposeFile":["docker-compose.codespaces.yml"],"service":"api","runServices":["api","redis","rabbitmq","nuq-postgres","playwright-service"],"workspaceFolder":"/workspaces/firecrawl","forwardPorts":[3002],"portsAttributes":{"3002":{"label":"Firecrawl API","onAutoForward":"notify"}},"postCreateCommand":"echo \"Firecrawl Codespace created. Services will start via docker compose.\"","remoteUser":"node","features":{"ghcr.io/devcontainers/features/docker-in-docker:2":{},"ghcr.io/devcontainers/features/github-cli:1":{}},"customizations":{"vscode":{"extensions":["dbaeumer.vscode-eslint","esbenp.prettier-vscode","ms-playwright.playwright","rust-lang.rust-analyzer"],"settings":{"terminal.integrated.defaultProfile.linux":"bash"}}}}'

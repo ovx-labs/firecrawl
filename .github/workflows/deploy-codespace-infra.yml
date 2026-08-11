@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .devcontainer/Dockerfile
+      - .devcontainer/base/Dockerfile
       - .devcontainer/devcontainer.json
       - .devcontainer/docker-compose.codespaces.yml
   workflow_dispatch:
@@ -36,10 +36,10 @@ jobs:
       - name: Build and push codespace infra image
         uses: docker/build-push-action@v5
         with:
-          context: .devcontainer
-          file: .devcontainer/Dockerfile
+          context: .devcontainer/base
+          file: .devcontainer/base/Dockerfile
           push: true
-          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:v3
+          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:v5
           provenance: false
           no-cache: true
           build-args: |

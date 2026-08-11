@@ -39,7 +39,7 @@ jobs:
           context: .devcontainer
           file: .devcontainer/Dockerfile
           push: true
-          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:v4
+          tags: ghcr.io/ovx-labs/firecrawl/codespace-infra:v3
           provenance: false
           no-cache: true
           build-args: |

@@ -18,6 +18,3 @@ RUN mkdir -p /etc/ssh/sshd_config.d \
 
 # Remove any devcontainer.json from base image to prevent merge conflicts
 RUN rm -rf /usr/local/share/devcontainer 2>/dev/null || true
-
-# Clear the devcontainer.metadata LABEL from base image to prevent merge
-LABEL devcontainer.metadata=''
